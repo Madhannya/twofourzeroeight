@@ -9,6 +9,7 @@ namespace twozerofoureight
     class TwoZeroFourEightModel : Model
     {
         protected int boardSize; // default is 4
+        protected int[,] var = new int[6, 6];
         protected int[,] board;
         protected Random rand;
 
@@ -39,7 +40,7 @@ namespace twozerofoureight
 
         private int[,] Random(int[,] input)
         {
-            while (true)
+            while (ChkFull()<16)
             {
                 int x = rand.Next(boardSize);
                 int y = rand.Next(boardSize);
@@ -103,6 +104,7 @@ namespace twozerofoureight
             }
             board = Random(board);
             NotifyAll();
+            if (ChkFull() == 16) ChkEnd();
         }
 
         public void PerformUp()
@@ -155,6 +157,7 @@ namespace twozerofoureight
             }
             board = Random(board);
             NotifyAll();
+            if (ChkFull() == 16) ChkEnd();
         }
 
         public void PerformRight()
@@ -209,6 +212,7 @@ namespace twozerofoureight
             }
             board = Random(board);
             NotifyAll();
+            if (ChkFull()==16) ChkEnd();
         }
 
         public void PerformLeft()
@@ -259,6 +263,75 @@ namespace twozerofoureight
             }
             board = Random(board);
             NotifyAll();
+            if (ChkFull() == 16) ChkEnd();
+        }
+        public int ChkFull()
+        {
+            int isfull = 0;
+            for(int i=0;i<4;i++)
+            {
+                 for(int j=0;j<4;j++)
+                {
+                    if (board[i, j] > 0)
+                    {
+                        isfull++;
+                    }
+                }
+            }
+            return isfull;
+        }
+        public void ChkEnd()
+        {
+            bool[] status = new bool[16];
+            int count = 0;
+            for(int i = 0; i < 16; i++)
+            {
+                status[i] = true;
+            }
+            for(int i = 0; i < 6; i++)
+            {
+                for(int j = 0; j < 6; j++)
+                {
+                    if(i == 0 || j == 0 || i == 5 || j == 5)
+                    {
+                        var[i, j] = 0;
+                    }
+                    else
+                    {
+                        var[i, j] = board[i - 1, j - 1];
+                    }
+                }
+            }
+            for(int i = 1; i < 5; i++)
+            {
+                for(int j = 1; j < 5; j++)
+                {
+
+                    if (var[i, j] != var[i - 1, j] && var[i, j] != var[i + 1, j] && var[i, j] != var[i, j - 1] && var[i, j] != var[i, j + 1])
+                    {
+                        status[count] = false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    count++;
+
+                }
+            }
+
+            for (int x = 0; x < 16; x++)
+            {
+                if (status[x])
+                {
+                    is_end = false;
+                    break;
+                }
+                else if (x == 15 && !status[15])
+                {
+                    is_end = true;
+                }
+            }
         }
     }
 }
